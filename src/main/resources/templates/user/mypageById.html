@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{common/layouts/defaultLayout}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@[[${user.userId}]]님의 페이지</title>
+<!-- Popper.js -->
+<script
+    src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<!-- 자바스크립트 -->
+<script type="text/javascript" src="/js/common/mypageById.js"></script> 
+<!-- css -->
+<link rel="stylesheet" href="/css/common/mypage.css">
+
+
+<!-- 변경 실패 시 알림 -->
+   <script th:if="${showAlert}">
+      alert('소개글 변경이 실패됐습니다.');
+   </script>
+
+</head>
+<body>
+<th:block layout:fragment="Content">
+    <div class="container">
+        
+        <h1 class="my-5 text-center formTitle">@[[${user.userId}]]</h1>
+                
+        <!-- 유저 소개 조회 -->
+        <div class="formBox shadow-sm" id="getUserBox">
+            <div class="needs-validation" th:object="${user}">
+                <input type="hidden" name="userId" th:value="${user.userId}">
+                <div class="m-3 d-flex justify-content-center userBox">
+                    <div class="user-imgWithBtnBox">
+                    <div class="user-imgBox">
+                        <div class="user-imgBox_imageborder">
+                            <img class="user-imgBox_image" 
+                                alt="유저 프로필 사진"
+                             th:src="${imagePath}? 
+                             ${imagePath}: '/images/defaultUserImage.png'" />
+                         </div>
+                    </div>
+                    </div>
+                    <div class="m-3 user-infoBox">
+                        <div class="row user-nicknameBox" style="margin-top: 10px;">
+                            <div class="col-md-6">
+                                <span th:text="*{userNickname}"
+                                    class="userNickname fixedName">내 닉네임</span>
+                                 <div th:if="${valid_userNickname}" id="valid" th:text="${valid_userNickname}" 
+									th:style="${valid_userNickname != null ? 'color:#F96666;' : ''}"></div>
+                            </div>
+                            <div class="col-md-6">
+                            </div>
+                        </div>
+                        <div class="row user-descBox">
+                            <span th:text="${user.userDescription!='' && user.userDescription!=null}? 
+                                    ${user.userDescription} : '나의 소개글 한 마디를 입력해주세요!'"
+                                    class="userDesc fixedUserDesc"
+                                    id="userDescription" name="userDescription"
+                                    rows="4"
+                                    style="white-space : pre-wrap;">나의 소개글 한 마디를 입력해주세요!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+
+    
+    <!-- 게시글 & 이미지 -->
+    <div class="container post-img">
+        <!--이미지 버튼 -->
+        <div class = "text-center">
+        <button class="btn post-img-btn mb-4" id="imgBtn" 
+            style="width: 35%; background-color: #E1ECC8;">
+            이미지</button>
+
+        <!-- 게시글 버튼 -->
+        <button class="btn post-img-btn mb-4" id="postBtn" 
+            style="width: 35%; background-color: #F7F6DC; margin-left: 5%;">게시글
+        </button>
+           </div>
+        <!-- 게시글 버튼 클릭하면 나오는 게시글 -->
+        <div class="collapse mt-5 p-3" id="postContainer">
+            <div id="needToChange" style="position: relative;">
+               <div class = "d-flex justify-content-between mb-4 px-2 me-auto"
+                    style="position: relative;">
+                   <p class = "my-2 myCount">
+                   게시물 수 : <span th:text="${myBoards.totalElements} + ' 개'"></span></p>
+               </div>
+               <p th:if="${myBoards.totalElements == 0}" 
+                  class= "noResult mx-5 mt-5 text-center fs-5">작성하신 게시물이 없습니다.</p>
+               <table class="table table-hover mx-4">
+                  <thead>
+                    <tr>
+                        <th class ="col-lg-2">글 번호</th>
+                        <th class ="col-lg-6">게시물</th>
+                        <th class ="col-lg-2">댓글 수</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  <!-- 자바스트립트 redirectToDetail 메서드 사용 : 컬럼을 누르면 게시글 상세페이지로 이동하는 url 작성-->
+                  <tr th:each="myBoard : ${myBoards}" 
+                      th:data-url="@{/board/{id}(id=${myBoard.boardId})}" 
+                      onclick="redirectToDetail(this)"
+                      style="cursor:pointer;">
+                    <td> <!-- 글번호 -->
+                      <span th:text = "${myBoard.boardId}">글 번호</span>
+                    </td>
+                    <td> <!-- 게시물 -->
+                        <!-- 제목의 글자수 길면 ...으로 생략 -->
+                        <div class = "first fs-5"
+                            th:text = "${#strings.length(myBoard.boardTitle) &gt; 50 ? 
+                            #strings.substring(myBoard.boardTitle, 0, 50) + '...' : myBoard.boardTitle}">글 제목</div>
+                        <div class = "second d-flex">
+                            <div class="rounded-5 mt-2" 
+                            	style="overflow:hidden; width: 40px; height: 40px;
+    align-items: center;">
+                                <img th:src="${imagePath}? 
+	                             ${imagePath}: '/images/defaultUserImage.png'"
+	                             class="img-fluid"
+	                             style="height: 100%;object-fit: cover;"/>
+                            </div>
+                            <div class="mx-2 mt-3" th:text = "${myBoard.userNickname}">작성자 닉네임</div>
+                        </div>
+                        
+                        <div class  ="third d-flex text-secondary">
+                            <div class="m-1" th:text = "|date ${#dates.format(myBoard.boardCreatedDate, 'yyyy-MM-dd')}|">작성일자</div>
+                            <div class="m-1" th:text = "|in ${myBoard.boardType}|">카테고리</div>
+                            <p class="m-1" style="width: 20px; height: 20px;">
+                                <i class="fa-regular fa-eye"></i>
+                            </p>
+                            <div class="m-1" th:text = "${myBoard.boardViewCount}">조회수</div>
+                            <p class="" style="width: 20px; height: 20px;">
+                                <img src = "/images/common/heart-click.png" class="img-fluid"/>
+                            </p>
+                            <div class="m-1" th:text = "${myBoard.likeCnt}">좋아요 수</div>
+                        </div>
+                    </td>
+                    <td> <!-- 댓글 수 -->
+                      <span th:text = "${myBoard.commentCnt}" class = "mx-4">댓글 수</span>
+                    </td>  
+                   </tr>
+                  </tbody>
+                </table>
+                <!-- 페이지 넘기기 뷰 & 기능 -->
+                <div class="pageInfo_wrap" id="pagination">
+                    <!--pagination-sm 추가하면 작아지고, pagination-lg 추가하면 커진다 -->
+                    <ul class="pagination pagination 
+                               justify-content-center">
+                       <li class="page-item" id="pagePrev"
+                           th:classappend="${currentPage == 0} ? 'disabled' : ''">
+                           <!-- 링크 클릭할 때 해당 링크의 url로 이동하는 기본 동작 막기 위해 사용
+                                자바스크립트가 없는 상황에서는 아무 것도 일어나지 않게끔 한다. -->
+                           <a class="page-link arrow" 
+                              href="javascript:void(0);"
+                              th:onclick="'loadPage(' + (${currentPage - 1}) + ')'">
+                                <i class="fa-solid fa-chevron-left"></i></a>
+                       </li>
+                       <th:block th:each="page : ${#numbers.sequence(pageStart, pageEnd)}">
+                           <li th:if="${page == (currentPage+1)}" 
+                               class="page-item active">
+                               <a class="page-link" 
+                               href="javascript:void(0);"
+                               th:onclick="'loadPage(' + (${page - 1}) + ')'">[[${page}]]</a>
+                           </li>
+                           <li th:unless="${page == (currentPage+1)}" 
+                               class="page-item">
+                               <a class="page-link" 
+                               href="javascript:void(0);"
+                               th:onclick="'loadPage(' + (${page - 1}) + ')'">[[${page}]]</a>
+                           </li>
+                       </th:block>
+                       <li class="page-item" id="pageNext"
+                           th:classappend="${currentPage == lastPage - 1} ? 'disabled' : ''">
+                           <a class="page-link arrow" 
+	                           href="javascript:void(0);"
+	                           th:onclick="'loadPage(' + (${currentPage + 1}) + ')'">
+	                               <i class="fa-solid fa-chevron-right"></i></a>
+                       </li>
+                    </ul>
+                </div><!-- 페이징 처리 끝 -->     
+            </div><!-- (게시글 + 페이지)ajax 사용하기 위함 -->
+                   
+           </div>
+
+        <!-- 이미지버튼 클릭하면 나오는 이미지 -->
+        <div class="collapse mt-3" id="imgContainer">  
+            <div class="container myImage-lists">
+                <!-- 게시물 사진이 없을 때 처리 -->
+                <div class = "d-flex justify-content-between mb-4 px-2 me-auto">
+                    <p class = "my-2 myCount">
+                    [[${user.userNickname}]] 님이 업로드한 사진 : <span th:text="${myBoardImageCnt} + ' 개'"></span></p>
+                    <p th:if="${myBoardImageCnt == 0}" 
+                    class= "noResult mx-5 mt-5 text-center fs-5">작성하신 게시물이 없습니다.</p>
+                </div>
+                <div class="row justify-content-left flex-wrap myImage-row">
+                    <div class="myImage-list-wrapper"
+                        th:data-url="@{/board/{id}(id=${myBoard.boardId})}" 
+                        onclick="redirectToDetail(this)"
+                        th:if="${myBoardImagePaths[stat.index] !=null}"
+                        th:each="myBoard, stat : ${myBoards}"
+                         >
+                        <!-- 현재 순환 중인 myBoard에 해당하는 이미지 경로를 가져와서 image에 할당 -->
+                        <div class="myImage-list">
+                            <img class="myImage-img"
+                                th:src="${myBoardImagePaths[stat.index]}"
+                                alt="나의 게시물 사진"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- 이미지 끝 -->
+       </div><!--게시글 & 이미지 끝 -->
+       </div>   
+</th:block>
+</body>
+</html>

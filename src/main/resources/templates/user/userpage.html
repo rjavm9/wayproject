@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{common/layouts/defaultLayout}">
+<head>
+<meta charset="UTF-8">
+<title>회원 정보 조회</title>
+
+<link href="/css/user/userpage.css" rel="stylesheet"></link>
+
+
+</head>
+<body>
+	<th:block layout:fragment="Content">
+
+		<div class="container pb-5">
+			<h1 class="text-center mt-5 ">회원 정보 조회</h1>
+			<div class="container border rounded-4 shadow-lg p-5 mb-5 userpage"
+				style="width: 800px;">
+
+
+				<!-- 초기 페이지 (아이콘 추가하기)-->
+				<form action="/mypage/userpage" method="post" id="originForm">
+					<div class="form-group mb-3 w-75 m-auto">
+						<label for="userId" class="form-label fs-5 mt-5">아이디</label> 
+						<span class="form-control-lg mt-2" id="userId" th:text="${user.userId}">
+						</span>
+
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto">
+						<label for="userName" class="form-label fs-5 mt-4">이 &nbsp; 름</label> 
+						<span class="form-control-lg mt-2" id="userName"
+							th:text="${user.userName}"> </span>
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto">
+						<label for="userNickname" class="form-label fs-5 mt-4">닉네임</label>
+						<span class="form-control-lg mt-2" id="userNickname"
+							th:text="${user.userNickname}"> </span>
+						<div th:if="${valid_userNickname}" id="valid"
+                     		th:text="${valid_userNickname}" 
+                     		th:style="${valid_userNickname != null ? 'color:#F96666;' : ''}"></div>
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto">
+						<label for="userTelNumber" class="form-label fs-5 mt-4">핸드폰
+							번호</label> <span class="form-control-lg mt-2" id="userTelNumber"
+							th:text="${user.userTelNumber}"> </span>
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto">
+						<label for="userEmail" class="form-label fs-5 mt-4">이메일</label> 
+						<span class="form-control-lg mt-2" id="userEmail"
+							th:text="${user.userEmail}"> </span>
+
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto">
+						<label for="userJoinDate" class="form-label fs-5 mt-4">생성일</label>
+						<span class="form-control-lg mt-2" id="userJoinDate"
+							th:text="${user.userJoinDate}"> </span>
+					</div>
+
+					<button type="button" id="modifyBtn" class="btn btn-danger rounded-3 d-block fs-5 w-75 mt-5 userpagebtn userpagebtn">회원정보 변경하기</button>
+				</form>
+
+
+
+
+				<!-- 수정 페이지 -->
+				<form action="/mypage/userpage" method="post" id="modifyForm"
+					th:object="${user}" style="display: none;">
+
+
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userId" class="form-label fs-5 ">아이디</label>
+						</div>
+						<div class="col-9">
+							<input type="text" class="form-control form-control-lg"
+								id="userId" name="userId" th:field="*{userId}"
+								th:value="${user != null}? ${user.getUserId()} : ''"
+								readonly>
+						</div>
+					</div>
+
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userName" class="form-label fs-5 mt-4">이 &nbsp; 름</label>
+						</div>
+						<div class="col-9">
+							<input type="text" class="form-control form-control-lg mt-2"
+								id="userName" name="userName"
+								
+								th:field="*{userName}" required>
+						</div>
+						<span th:if="${valid_userName}" id="valid"
+							th:text="${valid_userName}"></span>
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userNickname" class="form-label fs-5 mt-4">닉네임</label>
+						</div>
+						<div class="col-9">
+							<input type="text" class="form-control form-control-lg mt-2"
+								id="userNickname" name="userNickname"
+								th:value="${user != null}? ${user.getUserNickname()} : ''"
+								th:field="*{userNickname}" required>
+						</div>
+						<span th:if="${valid_userNickname}" id="valid"
+							th:text="${valid_userNickname}" 
+							th:style="${valid_userNickname != null ? 'color:#F96666;' : ''}"></span>
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userTelNumber" class="form-label fs-5 mt-4">핸드폰
+								번호</label>
+						</div>
+						<div class="col-9">
+							<input type="tel" class="form-control form-control-lg mt-2"
+								id="userTelNumber" name="userTelNumber"
+								th:value="${user != null}? ${user.getUserTelNumber()} : ''"
+								th:field="*{userTelNumber}" placeholder="010-1234-5678">
+						</div>
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userEmail" class="form-label fs-5 mt-4">이메일</label>
+						</div>
+						<div class="col-9">
+							<input type="email" class="form-control form-control-lg mt-2"
+								id="userEmail" name="userEmail"
+								th:value="${user != null}? ${user.getUserEmail()} : ''"
+								th:field="*{userEmail}" placeholder="walkaroundyou@gmail.com"
+								required>
+						</div>
+						<span th:if="${valid_userEmail}" id="valid"
+							th:text="${valid_userEmail}"></span>
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userJoinDate" class="form-label fs-5 mt-4">생성일</label>
+						</div>
+						<div class="col-9">
+							<input type="datetime" class="form-control form-control-lg mt-2"
+								id="userJoinDate" name="userJoinDate"
+								th:value="${user != null}? ${user.getUserJoinDate()} : ''"
+								th:field="*{userJoinDate}" required>
+						</div>
+					</div>
+
+					<button type="submit" class="btn btn-danger rounded-3 d-block fs-5 w-75 mt-5 userpagebtn">변경 완료</button>
+				</form>
+				
+				<!-- 수정 페이지 -->
+				<form action="/mypage/userpage" method="post" id="modifyForm2"
+					th:object="${user}" th:if="${user}" style="display: none;">
+
+
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userId" class="form-label fs-5 ">아이디</label>
+						</div>
+						<div class="col-9">
+							<input type="text" class="form-control form-control-lg"
+								id="userId" name="userId" th:field="*{userId}"
+								th:value="${user != null}? ${user.getUserId()} : ''"
+								readonly>
+						</div>
+					</div>
+
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userName" class="form-label fs-5 mt-4">이 &nbsp; 름</label>
+						</div>
+						<div class="col-9">
+							<input type="text" class="form-control form-control-lg mt-2"
+								id="userName" name="userName"
+								
+								th:field="*{userName}" required>
+						</div>
+						<span th:if="${valid_userName}" id="valid"
+							th:text="${valid_userName}"></span>
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userNickname" class="form-label fs-5 mt-4">닉네임</label>
+						</div>
+						<div class="col-9">
+							<input type="text" class="form-control form-control-lg mt-2"
+								id="userNickname" name="userNickname"
+								th:value="${user != null}? ${user.getUserNickname()} : ''"
+								th:field="*{userNickname}" required>
+						</div>
+						<span th:if="${valid_userNickname}" id="valid"
+							th:text="${valid_userNickname}"></span>
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userTelNumber" class="form-label fs-5 mt-4">핸드폰
+								번호</label>
+						</div>
+						<div class="col-9">
+							<input type="tel" class="form-control form-control-lg mt-2"
+								id="userTelNumber" name="userTelNumber"
+								th:value="${user != null}? ${user.getUserTelNumber()} : ''"
+								th:field="*{userTelNumber}" placeholder="010-1234-5678">
+						</div>
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userEmail" class="form-label fs-5 mt-4">이메일</label>
+						</div>
+						<div class="col-9">
+							<input type="email" class="form-control form-control-lg mt-2"
+								id="userEmail" name="userEmail"
+								th:value="${user != null}? ${user.getUserEmail()} : ''"
+								th:field="*{userEmail}" placeholder="walkaroundyou@gmail.com"
+								required>
+						</div>
+						<span th:if="${valid_userEmail}" id="valid"
+							th:text="${valid_userEmail}"></span>
+					</div>
+
+					<div class="form-group mb-3 w-75 m-auto row g-2 align-items-center">
+						<div class="col-3">
+							<label for="userJoinDate" class="form-label fs-5 mt-4">생성일</label>
+						</div>
+						<div class="col-9">
+							<input type="datetime" class="form-control form-control-lg mt-2"
+								id="userJoinDate" name="userJoinDate"
+								th:value="${user != null}? ${user.getUserJoinDate()} : ''"
+								th:field="*{userJoinDate}" required>
+						</div>
+					</div>
+
+					<button type="submit" class="btn btn-danger rounded-3 d-block fs-5 w-75 mt-5 userpagebtn">변경 완료</button>
+				</form>
+
+				<br>
+
+
+
+				<!-- 버튼 -->
+				<form action="/mypage/userpage/changepwd" method="get" >
+					<button type="submit" class="btn rounded-3 d-block fs-5 w-75 mt-5 changePwdBtn" >비밀번호
+						변경하기</button>
+				</form>
+				<form action="/mypage/userpage/withdraw" method="get">
+					<button type="submit"
+						class="btn rounded-3 d-block fs-5 w-75 mb-5 withdrawBtn">탈퇴하기</button>
+				</form>
+			</div>
+		</div>
+
+		<script>
+
+        // 버튼 클릭 시 폼 보이기/숨기기
+        document.getElementById("modifyBtn").addEventListener("click", function() {
+            let form1 = document.getElementById("modifyForm");
+            let form2 = document.getElementById("originForm");
+            let form3 = document.getElementById("modifyForm2");
+            if (form1.style.display === "none" || form1.style.display === "") {
+                form1.style.display = "block"; // 폼을 보이게 설정
+                form2.style.display = "none"; // 폼을 숨기게 설정
+                if(form3 == error) {
+                	form3.style.display = "block";
+                }
+            } 
+        });
+</script>
+	</th:block>
+</body>
+</html>
